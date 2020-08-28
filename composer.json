@@ -1,0 +1,32 @@
+{
+  "name": "smoren/query-relation-manager",
+  "description": "Class for building queries and making result array with relations (single and multiple)",
+  "keywords": ["query", "builder", "relation", "ActiveRecord", "ORM"],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Smoren",
+      "email": "ofigate@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=7.2.0",
+    "ext-pdo": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "Smoren\\Yii2\\QueryRelationManager\\": "src"
+    }
+  },
+  "config": {
+    "fxp-asset": {
+      "enabled": false
+    }
+  },
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https://asset-packagist.org"
+    }
+  ]
+}
