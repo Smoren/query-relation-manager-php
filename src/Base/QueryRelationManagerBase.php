@@ -17,6 +17,11 @@ abstract class QueryRelationManagerBase
     protected $query;
 
     /**
+     * @var string имя основного класса ORM-модели запроса
+     */
+    protected $mainClassName;
+
+    /**
      * @var string псевдоним основной таблицы запроса
      */
     protected $mainTableAlias;
@@ -40,6 +45,11 @@ abstract class QueryRelationManagerBase
      * @var callable[] карта модификаторов результата (псевдоним таблицы => функция)
      */
     protected $modifierMap = [];
+
+    /**
+     * @var string[] карта псевдонимов таблиц по именам классов
+     */
+    protected $mapClassNameToTableAlias = [];
 
     /**
      * @var string[] карта имен подключаемых таблиц по их псевдонимам
@@ -433,6 +443,7 @@ abstract class QueryRelationManagerBase
      */
     protected function __construct(string $className, string $alias, string $fieldJoinTo, string $primaryFieldName = 'id')
     {
+        $this->mainClassName = $className;
         $this->mainTableAlias = $alias;
         $this->mainTableName = $this->getTableName($className);
         $this->mainTableField = $fieldJoinTo;
@@ -455,6 +466,8 @@ abstract class QueryRelationManagerBase
         ?string $fieldJoinBy = null, ?string $containerFieldAlias = null
     ): self
     {
+        $this->mapClassNameToTableAlias[$className] = $joinAs;
+
         $tableName = $this->getTableName($className);
 
         if(isset($this->mapJoinAsToTableName[$joinAs])) {
