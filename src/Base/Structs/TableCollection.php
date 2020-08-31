@@ -20,16 +20,6 @@ class TableCollection
     protected $mainTable;
 
     /**
-     * @var Table[] карта объектов таблиц по имени класса ORM-модели
-     */
-    protected $mapByClassName = [];
-
-    /**
-     * @var Table[] карта объектов таблиц по имени таблицы
-     */
-    protected $mapByName = [];
-
-    /**
      * @var Table[] карта объектов таблиц по псевдониму таблицы в запросе
      */
     protected $mapByAlias = [];
@@ -46,8 +36,6 @@ class TableCollection
             $this->mainTable = $table;
         }
 
-        $this->addToMap('mapByClassName', 'className', $table);
-        $this->addToMap('mapByName', 'name', $table);
         $this->addToMap('mapByAlias', 'alias', $table);
 
         return $this;
@@ -65,28 +53,6 @@ class TableCollection
         }
 
         return $this->mainTable;
-    }
-
-    /**
-     * Получение объекта таблицы по имени класса ее ORM-модели
-     * @param string $className имя класса ORM-модели таблицы
-     * @return Table
-     * @throws QueryRelationManagerException
-     */
-    public function byClassName(string $className): Table
-    {
-        return $this->getFromMap('mapByClassName', $className);
-    }
-
-    /**
-     * Получение объекта таблицы по ее имени в БД
-     * @param string $name имя таблицы в БД
-     * @return Table
-     * @throws QueryRelationManagerException
-     */
-    public function byName(string $name): Table
-    {
-        return $this->getFromMap('mapByName', $name);
     }
 
     /**
