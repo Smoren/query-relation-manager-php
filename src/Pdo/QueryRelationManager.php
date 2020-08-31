@@ -9,7 +9,7 @@ use Smoren\Yii2\QueryRelationManager\Base\QueryWrapperInterface;
 use Smoren\Yii2\QueryRelationManager\Base\QueryRelationManagerException;
 
 /**
- * Class for making queries for getting data from database with relations and filters
+ * @inheritDoc
  * @package Smoren\Yii2\QueryRelationManager
  * @author Smoren <ofigate@gmail.com>
  */
@@ -17,9 +17,7 @@ class QueryRelationManager extends QueryRelationManagerBase
 {
 
     /**
-     * Возвращает имя таблицы по классу сущности ActiveRecord
-     * @param string $className имя класса
-     * @return string имя таблицы
+     * @inheritDoc
      */
     protected function getTableName(string $className): string
     {
@@ -27,8 +25,7 @@ class QueryRelationManager extends QueryRelationManagerBase
     }
 
     /**
-     * Создает объект запроса
-     * @return QueryWrapperInterface
+     * @inheritDoc
      */
     protected function createQuery(): QueryWrapperInterface
     {
@@ -36,15 +33,31 @@ class QueryRelationManager extends QueryRelationManagerBase
     }
 
     /**
-     * Возвращает список полей таблицы
-     * @param string $className
-     * @return array
+     * @inheritDoc
      * @throws QueryRelationManagerException
      */
     protected function getTableFields(string $className): array
     {
         $qw = new QueryWrapper();
         $qw->setRawSql('SHOW COLUMNS FROM '.addslashes($className));
+        $rows = $qw->all();
+
+        $result = [];
+        foreach($rows as $row) {
+            $result[] = $row['Field'];
+        }
+
+        return $result;
+    }
+
+    /**
+     * @inheritDoc
+     * @throws QueryRelationManagerException
+     */
+    protected function getPrimaryKey(string $className): array
+    {
+        $qw = new QueryWrapper();
+        $qw->setRawSql("SHOW COLUMNS FROM ".addslashes($className)." WHERE `Key` = 'PRI'");
         $rows = $qw->all();
 
         $result = [];

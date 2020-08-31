@@ -11,25 +11,26 @@ use Smoren\Yii2\QueryRelationManager\Base\QueryWrapperInterface;
 class QueryWrapper implements QueryWrapperInterface
 {
     /**
-     * @var PDO
+     * @var PDO объект соединения с базой данных
      */
     protected static $pdo;
 
     /**
-     * @var string
+     * @var string строка SQL-запроса
      */
     protected $query;
 
     /**
-     * @var array
+     * @var array массив динамических параметров запроса
      */
     protected $mapParams;
 
     /**
-     * @param string $dsn
-     * @param string $username
-     * @param string $password
-     * @return PDO
+     * Установка конфигурации подключения к БД
+     * @param string $dsn DSN
+     * @param string $username имя пользователя
+     * @param string $password пароль
+     * @return PDO объект подключения к БД
      */
     public static function setDbConfig(string $dsn, string $username, string $password): PDO
     {
@@ -91,7 +92,9 @@ class QueryWrapper implements QueryWrapperInterface
     /**
      * @inheritDoc
      */
-    public function join(string $type, array $mapTable, string $condition, array $extraJoinParams = []): QueryWrapperInterface
+    public function join(
+        string $type, array $mapTable, string $condition, array $extraJoinParams = []
+    ): QueryWrapperInterface
     {
         $this->query .= " ".addslashes($type)." JOIN ";
 
@@ -110,10 +113,10 @@ class QueryWrapper implements QueryWrapperInterface
     }
 
     /**
+     * @inheritDoc
      * @param PDO|null $db
      * @return array
      * @throws QueryRelationManagerException
-     * @inheritDoc
      */
     public function all($db = null): array
     {
