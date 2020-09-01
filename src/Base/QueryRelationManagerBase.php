@@ -299,6 +299,15 @@ abstract class QueryRelationManagerBase
     abstract protected function createQuery(): QueryWrapperInterface;
 
     /**
+     * Магический метод для клонирования инстанса
+     */
+    public function __clone()
+    {
+        $this->joinConditionCollection = clone $this->joinConditionCollection;
+        $this->tableCollection = clone $this->tableCollection;
+    }
+
+    /**
      * QueryRelationManager constructor.
      * @param string $className имя класса сущности ActiveRecord
      * @param string $alias псевдоним таблицы сущности
