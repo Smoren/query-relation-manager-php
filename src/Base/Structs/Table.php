@@ -56,6 +56,11 @@ class Table
     protected $pkFieldMapReverse = [];
 
     /**
+     * @var array цепочка полей первичных ключей подключаемых таблиц до данной
+     */
+    protected $pkFieldChain = [];
+
+    /**
      * Table constructor.
      * @param string $className ORM-класс, представляющий таблицу
      * @param string $name имя таблицы в БД
@@ -119,6 +124,21 @@ class Table
     }
 
     /**
+     * Проверка наличия данных из таблицы в кортеже, представляющем из себя строку из результата запроса к БД
+     * @param array $row строка из результата запроса SELECT
+     * @return bool
+     */
+    public function issetDataInRow(array &$row): bool
+    {
+        foreach($this->pkFieldMapReverse as $prefixedKey => $key) {
+            if($row[$prefixedKey] !== null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Получение данных из кортежа, представляющего из себя строку из результата запроса к БД
      * @param array $row строка из результата запроса SELECT
      * @param JoinConditionCollection $conditionCollection коллекция условий запроса
@@ -137,10 +157,8 @@ class Table
     {
         $item = [];
 
-        foreach($row as $key => $val) {
-            if(isset($this->fieldMapReverse[$key])) {
-                $item[$this->fieldMapReverse[$key]] = $val;
-            }
+        foreach($this->fieldMapReverse as $fieldPrefixed => $field) {
+            $item[$field] = $row[$fieldPrefixed];
         }
 
         /** @var JoinCondition $cond */
@@ -159,13 +177,13 @@ class Table
 
         $primaryKeyValue = $this->stringifyPrimaryKeyValue($row);
 
-        try {
+        if($conditionCollection->issetByJoinAs($this->alias)) {
             $cond = $conditionCollection->byJoinAs($this->alias);
             $joinTo = $cond->joinTo;
             $aliasTo = $joinTo->alias;
             $foreignKeyValue = $joinTo->stringifyPrimaryKeyValue($row);
             $type = $cond->type;
-        } catch(QueryRelationManagerException $e) {
+        } else {
             $aliasTo = null;
             $foreignKeyValue = null;
             $containerFieldAlias = null;
@@ -190,20 +208,27 @@ class Table
     }
 
     /**
+     * Установка цепочки полей первичных ключей присоединяемых таблиц до данной
+     * @param array $pkFieldChain
+     * @return $this
+     */
+    public function setPkFieldChain(array $pkFieldChain): self
+    {
+        $this->pkFieldChain = $pkFieldChain;
+        return $this;
+    }
+
+    /**
      * Получение значений полей первичного ключа таблицы в виде строки через дефис
      * @param array $row строка из результата запроса SELECT
      * @return string
-     * @throws QueryRelationManagerException
      */
     protected function stringifyPrimaryKeyValue(array $row): string
     {
         $primaryKeyValues = [];
 
-        foreach($this->pkFieldMapReverse as $fieldPrefixed => $field) {
-            if(!isset($row[$fieldPrefixed])) {
-                throw new QueryRelationManagerException("no primary key field '{$field}' found in row");
-            }
-            $primaryKeyValues[] = $row[$fieldPrefixed];
+        foreach($this->pkFieldChain as $field) {
+            $primaryKeyValues[] = $row[$field];
         }
 
         return implode('-', $primaryKeyValues);

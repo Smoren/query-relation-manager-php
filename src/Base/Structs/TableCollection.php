@@ -80,6 +80,52 @@ class TableCollection
     }
 
     /**
+     * Получение цепочки первичных ключей присоединяемых таблиц до данной
+     * @param string $tableAlias
+     * @param JoinConditionCollection $joinConditions
+     * @return array
+     * @throws QueryRelationManagerException
+     */
+    public function getPkFieldChain(string $tableAlias, JoinConditionCollection $joinConditions): array
+    {
+        $tableAliasChain = $this->getTableAliasChain($tableAlias, $joinConditions);
+        $result = [];
+
+        foreach($tableAliasChain as $alias) {
+            $table = $this->byAlias($alias);
+
+            foreach($table->primaryKey as $field) {
+                $result[] = "{$alias}_{$field}";
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Получение цепочки псеводнимов присоединяемых таблиц до данной
+     * @param string $tableAlias
+     * @param JoinConditionCollection $joinConditions
+     * @return array
+     */
+    public function getTableAliasChain(string $tableAlias, JoinConditionCollection $joinConditions): array
+    {
+        $result = [];
+
+        while(true) {
+            $result[] = $tableAlias;
+
+            if(!$joinConditions->issetByJoinAs($tableAlias)) {
+                break;
+            }
+
+            $tableAlias = $joinConditions->byJoinAs($tableAlias)->joinTo->alias;
+        }
+
+        return array_reverse($result);
+    }
+
+    /**
      * Добавление объекта таблицы в карту
      * @param string $mapName имя члена класса-карты
      * @param string $key ключ в карте

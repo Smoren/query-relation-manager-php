@@ -49,16 +49,26 @@ class JoinConditionCollection
     }
 
     /**
+     * Проверка наличия объекта условия присоединения таблицы по ее псевдониму в запросе
+     * @param string $joinAs псевдоним присоединяемой таблицы
+     * @return bool
+     */
+    public function issetByJoinAs(string $joinAs): bool
+    {
+        if(!isset($this->mapByJoinAs[$joinAs])) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Получение объекта условия присоединения таблицы по ее псевдониму в запросе
      * @param string $joinAs псевдоним присоединяемой таблицы
      * @return JoinCondition
-     * @throws QueryRelationManagerException
      */
     public function byJoinAs(string $joinAs): JoinCondition
     {
-        if(!isset($this->mapByJoinAs[$joinAs])) {
-            throw new QueryRelationManagerException("no condition found by table alias '{$joinAs}'");
-        }
         return $this->mapByJoinAs[$joinAs];
     }
 

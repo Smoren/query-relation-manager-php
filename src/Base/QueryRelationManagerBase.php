@@ -168,36 +168,35 @@ abstract class QueryRelationManagerBase
 
         foreach($rows as $row) {
             $this->tableCollection->each(function(Table $table) use (&$map, &$row, &$bufMap) {
-                try {
-                    [$item, $pkValue, $alias, $aliasTo, $fkValue, $containerFieldAlias, $type]
-                        = $table->getDataFromRow($row, $this->joinConditionCollection);
+                if(!$table->issetDataInRow($row)) {
+                    return;
+                }
 
-                    if(!isset($map[$alias][$pkValue])) {
-                        $map[$alias][$pkValue] = &$item;
+                [$item, $pkValue, $alias, $aliasTo, $fkValue, $containerFieldAlias, $type]
+                    = $table->getDataFromRow($row, $this->joinConditionCollection);
+
+                if(!isset($map[$alias][$pkValue])) {
+                    $map[$alias][$pkValue] = &$item;
+                }
+
+                if($aliasTo !== null) {
+                    $bufMapKey = implode('-', [$aliasTo, $fkValue, $containerFieldAlias, $pkValue]);
+                    switch($type) {
+                        case JoinCondition::TYPE_SINGLE:
+                            if(!isset($bufMap[$bufMapKey])) {
+                                $map[$aliasTo][$fkValue][$containerFieldAlias] = &$item;
+                                $bufMap[$bufMapKey] = 1;
+                            }
+                            break;
+                        case JoinCondition::TYPE_MULTIPLE:
+                            if(!isset($bufMap[$bufMapKey])) {
+                                $map[$aliasTo][$fkValue][$containerFieldAlias][] = &$item;
+                                $bufMap[$bufMapKey] = 1;
+                            }
+                            break;
+                        default:
+                            throw new QueryRelationManagerException("unknown condition type '{$type}'");
                     }
-
-                    if($aliasTo !== null) {
-                        $bufMapKey = implode('-', [$aliasTo, $fkValue, $containerFieldAlias, $pkValue]);
-                        switch($type) {
-                            case JoinCondition::TYPE_SINGLE:
-                                if(!isset($bufMap[$bufMapKey])) {
-                                    $map[$aliasTo][$fkValue][$containerFieldAlias] = &$item;
-                                    $bufMap[$bufMapKey] = 1;
-                                }
-                                break;
-                            case JoinCondition::TYPE_MULTIPLE:
-                                if(!isset($bufMap[$bufMapKey])) {
-                                    $map[$aliasTo][$fkValue][$containerFieldAlias][] = &$item;
-                                    $bufMap[$bufMapKey] = 1;
-                                }
-                                break;
-                            default:
-                                throw new QueryRelationManagerException("unknown condition type '{$type}'");
-                        }
-                    }
-
-                } catch(QueryRelationManagerException $e) {
-                    // пропускаем
                 }
             });
         }
@@ -219,6 +218,10 @@ abstract class QueryRelationManagerBase
      */
     public function prepare(): QueryWrapperInterface
     {
+        $this->tableCollection->each(function(Table $table) {
+            $table->setPkFieldChain($this->tableCollection->getPkFieldChain($table->alias, $this->joinConditionCollection));
+        });
+
         $this->query = $this->createQuery();
 
         $arSelect = [];
