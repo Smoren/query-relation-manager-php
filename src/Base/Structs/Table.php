@@ -40,7 +40,7 @@ class Table
     public $containerFieldAlias;
 
     /**
-     * @var array карта полей таблицы ["`псевдонимТаблицы`.`имяПоля`" => "псевдонимТаблицы_имяПоля", ...]
+     * @var array карта полей таблицы ["псевдонимТаблицы.имяПоля" => "псевдонимТаблицы_имяПоля", ...]
      */
     protected $fieldMap = [];
 
@@ -83,7 +83,7 @@ class Table
         $bufMap = [];
         foreach($fields as $field) {
             $bufMap[$field] = "{$this->alias}_{$field}";
-            $this->fieldMap["`{$this->alias}`.`{$field}`"] = "{$this->alias}_{$field}";
+            $this->fieldMap["{$this->alias}.{$field}"] = "{$this->alias}_{$field}";
             $this->fieldMapReverse["{$this->alias}_{$field}"] = $field;
         }
 
@@ -96,7 +96,7 @@ class Table
     }
 
     /**
-     * Возвращает карту полей таблицы ["`псевдонимТаблицы`.`имяПоля`" => "псевдонимТаблицы_имяПоля", ...]
+     * Возвращает карту полей таблицы ["псевдонимТаблицы.имяПоля" => "псевдонимТаблицы_имяПоля", ...]
      * @return string[]
      */
     public function getFieldMap(): array
@@ -201,7 +201,7 @@ class Table
     {
         $result = [];
         foreach($this->primaryKey as $field) {
-            $result[] = "`{$this->alias}`.`{$field}`";
+            $result[] = "{$this->alias}.{$field}";
         }
 
         return $result;

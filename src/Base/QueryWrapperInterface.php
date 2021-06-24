@@ -13,7 +13,7 @@ interface QueryWrapperInterface
 {
     /**
      * Передача в запрос список выбираемых полей
-     * @param array $arSelect карта выбираемых полей ["fieldAlias" => "`table`.`fieldName`", ...]
+     * @param array $arSelect карта выбираемых полей ["fieldAlias" => "table.fieldName", ...]
      * @return QueryWrapperInterface
      */
     public function select(array $arSelect): self;

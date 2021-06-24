@@ -91,7 +91,7 @@ class JoinCondition
     {
         $joins = [];
         foreach($this->joinCondition as $linkBy => $linkTo) {
-            $joins[] = "`{$this->table->alias}`.`{$linkBy}` = `{$this->joinTo->alias}`.`{$linkTo}`";
+            $joins[] = "{$this->table->alias}.{$linkBy} = {$this->joinTo->alias}.{$linkTo}";
         }
 
         return implode(' AND ', $joins).' '.$this->extraJoinCondition;
