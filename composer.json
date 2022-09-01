@@ -23,7 +23,7 @@
   "autoload": {
     "psr-4": {
       "Smoren\\QueryRelationManager\\": "src",
-      "Smoren\\QueryRelationManager\\Tests\\Unit\\": "tests"
+      "Smoren\\QueryRelationManager\\Tests\\Unit\\": "tests/unit"
     }
   },
   "config": {
