@@ -1,21 +1,17 @@
 <?php
 
+namespace Smoren\QueryRelationManager\Pdo;
 
-namespace Smoren\Yii2\QueryRelationManager\Pdo;
-
-
-use Smoren\Yii2\QueryRelationManager\Base\QueryRelationManagerBase;
-use Smoren\Yii2\QueryRelationManager\Base\QueryWrapperInterface;
-use Smoren\Yii2\QueryRelationManager\Base\QueryRelationManagerException;
+use Smoren\QueryRelationManager\Base\QueryRelationManagerBase;
+use Smoren\QueryRelationManager\Base\QueryWrapperInterface;
+use Smoren\QueryRelationManager\Base\QueryRelationManagerException;
 
 /**
  * @inheritDoc
- * @package Smoren\Yii2\QueryRelationManager
  * @author Smoren <ofigate@gmail.com>
  */
 class QueryRelationManager extends QueryRelationManagerBase
 {
-
     /**
      * @inheritDoc
      */
@@ -42,6 +38,7 @@ class QueryRelationManager extends QueryRelationManagerBase
         $qw->setRawSql('SHOW COLUMNS FROM '.addslashes($className));
         $rows = $qw->all();
 
+        /** @var array<string> $result */
         $result = [];
         foreach($rows as $row) {
             $result[] = $row['Field'];
@@ -60,6 +57,7 @@ class QueryRelationManager extends QueryRelationManagerBase
         $qw->setRawSql("SHOW COLUMNS FROM ".addslashes($className)." WHERE Key = 'PRI'");
         $rows = $qw->all();
 
+        /** @var array<string> $result */
         $result = [];
         foreach($rows as $row) {
             $result[] = $row['Field'];

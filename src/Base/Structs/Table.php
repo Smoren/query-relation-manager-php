@@ -1,15 +1,12 @@
 <?php
 
+namespace Smoren\QueryRelationManager\Base\Structs;
 
-namespace Smoren\Yii2\QueryRelationManager\Base\Structs;
-
-
-use Smoren\Yii2\QueryRelationManager\Base\QueryRelationManagerException;
+use Smoren\QueryRelationManager\Base\QueryRelationManagerException;
 
 /**
  * Class Table
  * Класс-хранилище данных о таблице, которая участвует в запросе
- * @package Smoren\Yii2\QueryRelationManager\Base\Structs
  * @author Smoren <ofigate@gmail.com>
  */
 class Table
@@ -17,63 +14,68 @@ class Table
     /**
      * @var string ORM-класс, представляющий таблицу
      */
-    public $className;
+    public string $className;
 
     /**
      * @var string имя таблицы в БД
      */
-    public $name;
+    public string $name;
 
     /**
      * @var string псевдоним таблицы в запросе
      */
-    public $alias;
+    public string $alias;
 
     /**
      * @var string[] поля первичного ключа таблицы
      */
-    public $primaryKey;
+    public array $primaryKey;
 
     /**
-     * @var string поле-контейнер у родительского элемента, в который будет помещен элемент этой таблицы
+     * @var string|null поле-контейнер у родительского элемента, в который будет помещен элемент этой таблицы
      */
-    public $containerFieldAlias;
+    public ?string $containerFieldAlias;
 
     /**
-     * @var array карта полей таблицы ["псевдонимТаблицы.имяПоля" => "псевдонимТаблицы_имяПоля", ...]
+     * @var array<string, string> карта полей таблицы ["псевдонимТаблицы.имяПоля" => "псевдонимТаблицы_имяПоля", ...]
      */
-    protected $fieldMap = [];
+    protected array $fieldMap = [];
 
     /**
-     * @var array обратная карта полей таблицы ["псевдонимТаблицы_имяПоля" => "имяПоля"]
+     * @var array<string, string> обратная карта полей таблицы ["псевдонимТаблицы_имяПоля" => "имяПоля"]
      */
-    protected $fieldMapReverse = [];
+    protected array $fieldMapReverse = [];
 
     /**
-     * @var array обратная карта полей, составляющих первичный ключ таблицы
+     * @var array<string, string> обратная карта полей, составляющих первичный ключ таблицы
      * Пример: ["псевдонимТаблицы_имяПоля" => "имяПоля"]
      */
-    protected $pkFieldMapReverse = [];
+    protected array $pkFieldMapReverse = [];
 
     /**
-     * @var array цепочка полей первичных ключей подключаемых таблиц до данной
+     * @var array<string> цепочка полей первичных ключей подключаемых таблиц до данной
      */
-    protected $pkFieldChain = [];
+    protected array $pkFieldChain = [];
 
     /**
      * Table constructor.
      * @param string $className ORM-класс, представляющий таблицу
      * @param string $name имя таблицы в БД
      * @param string $alias псевдоним таблицы в запросе
-     * @param array $fields список имен полей таблицы
-     * @param array $primaryKey поля первичного ключа таблицы
-     * @param string $containerFieldAlias поле-контейнер у родительского элемента, в который будет помещен элемент этой таблицы
+     * @param array<string> $fields список имен полей таблицы
+     * @param array<string> $primaryKey поля первичного ключа таблицы
+     * @param string|null $containerFieldAlias поле-контейнер у родительского элемента,
+     * в который будет помещен элемент этой таблицы
      * @throws QueryRelationManagerException
      */
     public function __construct(
-        string $className, string $name, string $alias, array $fields, array $primaryKey, ?string $containerFieldAlias = null
-    )
-    {
+        string $className,
+        string $name,
+        string $alias,
+        array $fields,
+        array $primaryKey,
+        ?string $containerFieldAlias = null
+    ) {
         $this->className = $className;
         $this->name = $name;
         $this->alias = $alias;
@@ -97,7 +99,7 @@ class Table
 
     /**
      * Возвращает карту полей таблицы ["псевдонимТаблицы.имяПоля" => "псевдонимТаблицы_имяПоля", ...]
-     * @return string[]
+     * @return array<string>
      */
     public function getFieldMap(): array
     {
@@ -125,7 +127,7 @@ class Table
 
     /**
      * Проверка наличия данных из таблицы в кортеже, представляющем из себя строку из результата запроса к БД
-     * @param array $row строка из результата запроса SELECT
+     * @param array<string, mixed> $row строка из результата запроса SELECT
      * @return bool
      */
     public function issetDataInRow(array &$row): bool
@@ -140,9 +142,9 @@ class Table
 
     /**
      * Получение данных из кортежа, представляющего из себя строку из результата запроса к БД
-     * @param array $row строка из результата запроса SELECT
+     * @param array<string, mixed> $row строка из результата запроса SELECT
      * @param JoinConditionCollection $conditionCollection коллекция условий запроса
-     * @return array [
+     * @return array<mixed> [
      *  "данные из строки, соотвествующие таблице",
      *  "значения полей первичного ключа через дефис",
      *  "псевдоним этой таблицы",
@@ -195,7 +197,7 @@ class Table
 
     /**
      * Получение списка полей первичного ключа таблицы с префиксом-псевдонимом таблицы через точку
-     * @return array
+     * @return array<string>
      */
     public function getPrimaryKeyForSelect(): array
     {
@@ -209,7 +211,7 @@ class Table
 
     /**
      * Установка цепочки полей первичных ключей присоединяемых таблиц до данной
-     * @param array $pkFieldChain
+     * @param array<string> $pkFieldChain
      * @return $this
      */
     public function setPkFieldChain(array $pkFieldChain): self
@@ -220,7 +222,7 @@ class Table
 
     /**
      * Получение значений полей первичного ключа таблицы в виде строки через дефис
-     * @param array $row строка из результата запроса SELECT
+     * @param array<string, mixed> $row строка из результата запроса SELECT
      * @return string
      */
     protected function stringifyPrimaryKeyValue(array $row): string

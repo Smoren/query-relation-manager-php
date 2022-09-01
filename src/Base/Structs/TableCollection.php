@@ -1,15 +1,12 @@
 <?php
 
+namespace Smoren\QueryRelationManager\Base\Structs;
 
-namespace Smoren\Yii2\QueryRelationManager\Base\Structs;
-
-
-use Smoren\Yii2\QueryRelationManager\Base\QueryRelationManagerException;
+use Smoren\QueryRelationManager\Base\QueryRelationManagerException;
 
 /**
  * Class TableCollection
  * Класс-коллекция объектов таблиц, участвующих в запросе
- * @package Smoren\Yii2\QueryRelationManager\Base\Structs
  * @author Smoren <ofigate@gmail.com>
  */
 class TableCollection
@@ -68,7 +65,8 @@ class TableCollection
 
     /**
      * Перебор коллекции
-     * @param callable $callback функция, которая будет запущена для каждого элемента коллекции с передачей оного в качестве аргумента
+     * @param callable $callback функция, которая будет запущена для каждого элемента коллекции
+     * с передачей оного в качестве аргумента
      * @return $this
      */
     public function each(callable $callback): self
@@ -83,7 +81,7 @@ class TableCollection
      * Получение цепочки первичных ключей присоединяемых таблиц до данной
      * @param string $tableAlias
      * @param JoinConditionCollection $joinConditions
-     * @return array
+     * @return array<string>
      * @throws QueryRelationManagerException
      */
     public function getPkFieldChain(string $tableAlias, JoinConditionCollection $joinConditions): array
@@ -106,7 +104,7 @@ class TableCollection
      * Получение цепочки псеводнимов присоединяемых таблиц до данной
      * @param string $tableAlias
      * @param JoinConditionCollection $joinConditions
-     * @return array
+     * @return array<string>
      */
     public function getTableAliasChain(string $tableAlias, JoinConditionCollection $joinConditions): array
     {

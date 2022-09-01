@@ -1,15 +1,12 @@
 <?php
 
+namespace Smoren\QueryRelationManager\Base\Structs;
 
-namespace Smoren\Yii2\QueryRelationManager\Base\Structs;
-
-
-use Smoren\Yii2\QueryRelationManager\Base\QueryRelationManagerException;
+use Smoren\QueryRelationManager\Base\QueryRelationManagerException;
 
 /**
  * Class JoinConditionManager
  * Класс-коллекция объектов условий присоединения
- * @package Smoren\Yii2\QueryRelationManager\Base\Structs
  * @author Smoren <ofigate@gmail.com>
  */
 class JoinConditionCollection
@@ -17,12 +14,13 @@ class JoinConditionCollection
     /**
      * @var JoinCondition[] карта объектов условий присоединения по псевдониму присоединяемой таблицы
      */
-    protected $mapByJoinAs = [];
+    protected array $mapByJoinAs = [];
 
     /**
-     * @var JoinCondition[][] катра спика объектов условий присоединения по псевдониму таблицы, к которой осуществляется присоединение
+     * @var JoinCondition[][] карта списка объектов условий присоединения по псевдониму таблицы,
+     * к которой осуществляется присоединение
      */
-    protected $matrixByJoinTo = [];
+    protected array $matrixByJoinTo = [];
 
     /**
      * Добавление объекта условия присоединения таблицы
@@ -73,7 +71,8 @@ class JoinConditionCollection
     }
 
     /**
-     * Получение списка объекта условий присоединения таблиц по псевдониму таблицы, к которой осуществляется присоединение
+     * Получение списка объекта условий присоединения таблиц по псевдониму таблицы,
+     * к которой осуществляется присоединение
      * @param string $joinTo псевдоним таблицы, к которой осуществляется присоединение
      * @return JoinCondition[]
      */
@@ -87,7 +86,8 @@ class JoinConditionCollection
 
     /**
      * Перебор коллекции
-     * @param callable $callback функция, которая будет запущена для каждого элемента коллекции с передачей оного в качестве аргумента
+     * @param callable $callback функция, которая будет запущена для каждого элемента коллекции
+     * с передачей оного в качестве аргумента
      * @return $this
      */
     public function each(callable $callback): self

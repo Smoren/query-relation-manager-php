@@ -1,18 +1,15 @@
 <?php
 
+namespace Smoren\QueryRelationManager\Base;
 
-namespace Smoren\Yii2\QueryRelationManager\Base;
-
-
-use Smoren\Yii2\QueryRelationManager\Base\Structs\JoinCondition;
-use Smoren\Yii2\QueryRelationManager\Base\Structs\JoinConditionCollection;
-use Smoren\Yii2\QueryRelationManager\Base\Structs\Table;
-use Smoren\Yii2\QueryRelationManager\Base\Structs\TableCollection;
+use Smoren\QueryRelationManager\Base\Structs\JoinCondition;
+use Smoren\QueryRelationManager\Base\Structs\JoinConditionCollection;
+use Smoren\QueryRelationManager\Base\Structs\Table;
+use Smoren\QueryRelationManager\Base\Structs\TableCollection;
 
 /**
  * Абстрактный класс, отвечающий за построение запроса на получение данных из нескольких таблиц
  * с учетом их отношений и дополнительных условий, а также за представление результата в древовидной структуре
- * @package Smoren\Yii2\QueryRelationManager\Base
  * @author Smoren <ofigate@gmail.com>
  */
 abstract class QueryRelationManagerBase
@@ -20,27 +17,28 @@ abstract class QueryRelationManagerBase
     /**
      * @var QueryWrapperInterface объект билдера запроса
      */
-    protected $query;
+    protected QueryWrapperInterface $query;
 
     /**
      * @var JoinConditionCollection коллекция отношений в запросе
      */
-    protected $joinConditionCollection;
+    protected JoinConditionCollection $joinConditionCollection;
 
     /**
      * @var TableCollection коллекция таблиц, участвующих в запросе
      */
-    protected $tableCollection;
+    protected TableCollection $tableCollection;
 
     /**
-     * @var callable[] массив функций-коллбэков для внесения дополнительных корректив в запров
+     * @var array<callable> массив функций-коллбэков для внесения дополнительных корректив в запров
      */
-    protected $filters = [];
+    protected array $filters = [];
 
     /**
-     * @var callable[] карта функций-коллбэков по псевдониму таблицы для внесения изменений в готовые данные результата
+     * @var array<callable> карта функций-коллбэков по псевдониму таблицы для внесения изменений
+     * в готовые данные результата
      */
-    protected $modifierMap = [];
+    protected array $modifierMap = [];
 
     /**
      * Начинает формирование данных запроса
@@ -60,29 +58,42 @@ abstract class QueryRelationManagerBase
      * @param string $className имя класса ActiveRecord, сущности которого нужно подключить
      * @param string $joinAs псевдоним для таблицы, связанной с классом
      * @param string $joinTo псевдоним таблицы, к которой будут подключаться сущности класса
-     * @param array $joinCondition основное условие присоединения
+     * @param array<string, string> $joinCondition основное условие присоединения
      * @param string $joinType тип присоединения таблицы ("inner", "left", "right")
      * @param string|null $extraJoinCondition дополнительные условия join-связи
-     * @param array $extraJoinParams параметры дополнительных условий join-связи
+     * @param array<string, scalar> $extraJoinParams параметры дополнительных условий join-связи
      * @return $this
      * @throws QueryRelationManagerException
      */
     public function withSingle(
-        string $containerFieldAlias, string $className, string $joinAs, string $joinTo,
-        array $joinCondition, string $joinType = 'left',
-        ?string $extraJoinCondition = null, array $extraJoinParams = []
-    ): self
-    {
+        string $containerFieldAlias,
+        string $className,
+        string $joinAs,
+        string $joinTo,
+        array $joinCondition,
+        string $joinType = 'left',
+        ?string $extraJoinCondition = null,
+        array $extraJoinParams = []
+    ): self {
         $table = new Table(
-            $className, $this->getTableName($className), $joinAs,
-            $this->getTableFields($className), $this->getPrimaryKey($className), $containerFieldAlias
+            $className,
+            $this->getTableName($className),
+            $joinAs,
+            $this->getTableFields($className),
+            $this->getPrimaryKey($className),
+            $containerFieldAlias
         );
 
         $this->tableCollection->add($table);
 
         $this->joinConditionCollection->add(new JoinCondition(
-            JoinCondition::TYPE_SINGLE, $table, $this->tableCollection->byAlias($joinTo),
-            $joinCondition, $joinType, $extraJoinCondition, $extraJoinParams
+            JoinCondition::TYPE_SINGLE,
+            $table,
+            $this->tableCollection->byAlias($joinTo),
+            $joinCondition,
+            $joinType,
+            $extraJoinCondition,
+            $extraJoinParams
         ));
 
         return $this;
@@ -94,29 +105,42 @@ abstract class QueryRelationManagerBase
      * @param string $className имя класса ActiveRecord, сущности которого нужно подключить
      * @param string $joinAs псевдоним для таблицы, связанной с классом
      * @param string $joinTo псевдоним таблицы, к которой будут подключаться сущности класса
-     * @param array $joinCondition основное условие присоединения
+     * @param array<string, string> $joinCondition основное условие присоединения
      * @param string $joinType тип присоединения таблицы ("inner", "left", "right")
      * @param string|null $extraJoinCondition дополнительные условия join-связи
-     * @param array $extraJoinParams параметры дополнительных условий join-связи
+     * @param array<string, scalar> $extraJoinParams параметры дополнительных условий join-связи
      * @return $this
      * @throws QueryRelationManagerException
      */
     public function withMultiple(
-        string $containerFieldAlias, string $className, string $joinAs, string $joinTo,
-        array $joinCondition, string $joinType = 'left',
-        ?string $extraJoinCondition = null, array $extraJoinParams = []
-    ): self
-    {
+        string $containerFieldAlias,
+        string $className,
+        string $joinAs,
+        string $joinTo,
+        array $joinCondition,
+        string $joinType = 'left',
+        ?string $extraJoinCondition = null,
+        array $extraJoinParams = []
+    ): self {
         $table = new Table(
-            $className, $this->getTableName($className), $joinAs,
-            $this->getTableFields($className), $this->getPrimaryKey($className), $containerFieldAlias
+            $className,
+            $this->getTableName($className),
+            $joinAs,
+            $this->getTableFields($className),
+            $this->getPrimaryKey($className),
+            $containerFieldAlias
         );
 
         $this->tableCollection->add($table);
 
         $this->joinConditionCollection->add(new JoinCondition(
-            JoinCondition::TYPE_MULTIPLE, $table, $this->tableCollection->byAlias($joinTo),
-            $joinCondition, $joinType, $extraJoinCondition, $extraJoinParams
+            JoinCondition::TYPE_MULTIPLE,
+            $table,
+            $this->tableCollection->byAlias($joinTo),
+            $joinCondition,
+            $joinType,
+            $extraJoinCondition,
+            $extraJoinParams
         ));
 
         return $this;
@@ -150,7 +174,7 @@ abstract class QueryRelationManagerBase
     /**
      * Выполняет запрос к базе, собирает и возвращает результат
      * @param mixed|null $db подключение к БД
-     * @return array массив сущностей главной таблицы с отношениями подключенных таблиц
+     * @return array<array<mixed>> массив сущностей главной таблицы с отношениями подключенных таблиц
      * @throws QueryRelationManagerException
      */
     public function all($db = null): array
@@ -181,15 +205,18 @@ abstract class QueryRelationManagerBase
 
                 if($aliasTo !== null) {
                     $bufMapKey = implode('-', [$aliasTo, $fkValue, $containerFieldAlias, $pkValue]);
+                    /** @var string $type */
                     switch($type) {
                         case JoinCondition::TYPE_SINGLE:
                             if(!isset($bufMap[$bufMapKey])) {
+                                /** @var mixed[][][] $map */
                                 $map[$aliasTo][$fkValue][$containerFieldAlias] = &$item;
                                 $bufMap[$bufMapKey] = 1;
                             }
                             break;
                         case JoinCondition::TYPE_MULTIPLE:
                             if(!isset($bufMap[$bufMapKey])) {
+                                /** @var mixed[][][][] $map */
                                 $map[$aliasTo][$fkValue][$containerFieldAlias][] = &$item;
                                 $bufMap[$bufMapKey] = 1;
                             }
@@ -219,7 +246,9 @@ abstract class QueryRelationManagerBase
     public function prepare(): QueryWrapperInterface
     {
         $this->tableCollection->each(function(Table $table) {
-            $table->setPkFieldChain($this->tableCollection->getPkFieldChain($table->alias, $this->joinConditionCollection));
+            $table->setPkFieldChain(
+                $this->tableCollection->getPkFieldChain($table->alias, $this->joinConditionCollection)
+            );
         });
 
         $this->query = $this->createQuery();
@@ -237,10 +266,12 @@ abstract class QueryRelationManagerBase
             ->select($arSelect)
             ->from([$mainTable->alias => $mainTable->name]);
 
-
         $this->joinConditionCollection->each(function(JoinCondition $cond) {
             $this->query->join(
-                $cond->joinType, [$cond->table->alias => $cond->table->name], $cond->stringify(), $cond->extraJoinParams
+                $cond->joinType,
+                [$cond->table->alias => $cond->table->name],
+                $cond->stringify(),
+                $cond->extraJoinParams
             );
         });
 
@@ -284,14 +315,14 @@ abstract class QueryRelationManagerBase
     /**
      * Возвращает список полей таблицы
      * @param string $className
-     * @return array
+     * @return array<string>
      */
     abstract protected function getTableFields(string $className): array;
 
     /**
      * Возвращает поля первичного ключа таблицы
      * @param string $className
-     * @return array
+     * @return array<string>
      */
     abstract protected function getPrimaryKey(string $className): array;
 
@@ -316,14 +347,17 @@ abstract class QueryRelationManagerBase
      * @param string $alias псевдоним таблицы сущности
      * @throws QueryRelationManagerException
      */
-    protected function __construct(string $className, string $alias)
+    final protected function __construct(string $className, string $alias)
     {
         $this->tableCollection = new TableCollection();
         $this->joinConditionCollection = new JoinConditionCollection();
 
         $this->tableCollection->add(new Table(
-            $className, $this->getTableName($className), $alias,
-            $this->getTableFields($className), $this->getPrimaryKey($className)
+            $className,
+            $this->getTableName($className),
+            $alias,
+            $this->getTableFields($className),
+            $this->getPrimaryKey($className)
         ));
     }
 }

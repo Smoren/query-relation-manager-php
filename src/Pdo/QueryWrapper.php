@@ -1,29 +1,30 @@
 <?php
 
-
-namespace Smoren\Yii2\QueryRelationManager\Pdo;
+namespace Smoren\QueryRelationManager\Pdo;
 
 use PDO;
-use Smoren\Yii2\QueryRelationManager\Base\QueryRelationManagerException;
-use Smoren\Yii2\QueryRelationManager\Base\QueryWrapperInterface;
+use Smoren\QueryRelationManager\Base\QueryRelationManagerException;
+use Smoren\QueryRelationManager\Base\QueryWrapperInterface;
 
-
+/**
+ * @author Smoren <ofigate@gmail.com>
+ */
 class QueryWrapper implements QueryWrapperInterface
 {
     /**
-     * @var PDO объект соединения с базой данных
+     * @var PDO|null объект соединения с базой данных
      */
-    protected static $pdo;
+    protected static ?PDO $pdo;
 
     /**
      * @var string строка SQL-запроса
      */
-    protected $query;
+    protected string $query;
 
     /**
-     * @var array массив динамических параметров запроса
+     * @var array<string, scalar> массив динамических параметров запроса
      */
-    protected $mapParams;
+    protected array $mapParams;
 
     /**
      * Установка конфигурации подключения к БД
@@ -93,9 +94,11 @@ class QueryWrapper implements QueryWrapperInterface
      * @inheritDoc
      */
     public function join(
-        string $type, array $mapTable, string $condition, array $extraJoinParams = []
-    ): QueryWrapperInterface
-    {
+        string $type,
+        array $mapTable,
+        string $condition,
+        array $extraJoinParams = []
+    ): QueryWrapperInterface {
         $this->query .= " ".addslashes($type)." JOIN ";
 
         foreach($mapTable as $alias => $tableName) {
@@ -115,12 +118,11 @@ class QueryWrapper implements QueryWrapperInterface
     /**
      * @inheritDoc
      * @param PDO|null $db
-     * @return array
+     * @return array<array<mixed>>
      * @throws QueryRelationManagerException
      */
     public function all($db = null): array
     {
-        /** @var PDO $db */
         $db = $db ?? static::$pdo;
 
         if(!$db) {
@@ -135,7 +137,7 @@ class QueryWrapper implements QueryWrapperInterface
 
         $q->execute();
 
-        return $q->fetchAll();
+        return $q->fetchAll() ?: [];
     }
 
     /**

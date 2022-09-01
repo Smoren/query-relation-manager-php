@@ -1,14 +1,13 @@
 <?php
 
+namespace Smoren\QueryRelationManager\Base;
 
-namespace Smoren\Yii2\QueryRelationManager\Base;
+use Exception;
 
 /**
  * Class QueryRelationManagerException
- * @package Smoren\Yii2\QueryRelationManager\Base
  * @author Smoren <ofigate@gmail.com>
  */
-class QueryRelationManagerException extends \Exception
+class QueryRelationManagerException extends Exception
 {
-
 }
