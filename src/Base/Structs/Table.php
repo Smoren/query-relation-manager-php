@@ -12,60 +12,59 @@ use Smoren\QueryRelationManager\Base\QueryRelationManagerException;
 class Table
 {
     /**
-     * @var string ORM-класс, представляющий таблицу
+     * @var string class of ORM model wrapping the table
      */
     public string $className;
 
     /**
-     * @var string имя таблицы в БД
+     * @var string table name in DB
      */
     public string $name;
 
     /**
-     * @var string псевдоним таблицы в запросе
+     * @var string table alias in query
      */
     public string $alias;
 
     /**
-     * @var string[] поля первичного ключа таблицы
+     * @var string[] fields of the primary key of the table
      */
     public array $primaryKey;
 
     /**
-     * @var string|null поле-контейнер у родительского элемента, в который будет помещен элемент этой таблицы
+     * @var string|null container key of parent item to put the current item to
      */
     public ?string $containerFieldAlias;
 
     /**
-     * @var array<string, string> карта полей таблицы ["псевдонимТаблицы.имяПоля" => "псевдонимТаблицы_имяПоля", ...]
+     * @var array<string, string> table fields map ["tableAlias.fieldName" => "tableAlias_fieldName", ...]
      */
     protected array $fieldMap = [];
 
     /**
-     * @var array<string, string> обратная карта полей таблицы ["псевдонимТаблицы_имяПоля" => "имяПоля"]
+     * @var array<string, string> reverse table fields map ["tableAlias_fieldName" => "tableAlias.fieldName"]
      */
     protected array $fieldMapReverse = [];
 
     /**
-     * @var array<string, string> обратная карта полей, составляющих первичный ключ таблицы
-     * Пример: ["псевдонимТаблицы_имяПоля" => "имяПоля"]
+     * @var array<string, string> reverse map of the fields of the primary key
+     * e.g. ["tableAlias_fieldName" => "fieldName"]
      */
     protected array $pkFieldMapReverse = [];
 
     /**
-     * @var array<string> цепочка полей первичных ключей подключаемых таблиц до данной
+     * @var array<string> chain of the primary key's fields of all the joined tables till current
      */
     protected array $pkFieldChain = [];
 
     /**
      * Table constructor.
-     * @param string $className ORM-класс, представляющий таблицу
-     * @param string $name имя таблицы в БД
-     * @param string $alias псевдоним таблицы в запросе
-     * @param array<string> $fields список имен полей таблицы
-     * @param array<string> $primaryKey поля первичного ключа таблицы
-     * @param string|null $containerFieldAlias поле-контейнер у родительского элемента,
-     * в который будет помещен элемент этой таблицы
+     * @param string $className class of ORM model wrapping the table
+     * @param string $name table name in DB
+     * @param string $alias table alias in query
+     * @param array<string> $fields list of fields of the table
+     * @param array<string> $primaryKey fields of the primary key of the table
+     * @param string|null $containerFieldAlias container key of parent item to put the current item to
      * @throws QueryRelationManagerException
      */
     public function __construct(
@@ -98,7 +97,7 @@ class Table
     }
 
     /**
-     * Возвращает карту полей таблицы ["псевдонимТаблицы.имяПоля" => "псевдонимТаблицы_имяПоля", ...]
+     * Returns fields map of the table ["tableAlias.fieldName" => "tableAlias_fieldName", ...]
      * @return array<string>
      */
     public function getFieldMap(): array
@@ -107,8 +106,8 @@ class Table
     }
 
     /**
-     * Возвращает имя поля по его имени с префиксом
-     * @param string $fieldPrefixed имя поля с префиксом (псевдонимом таблицы)
+     * Returns field name by it's prefixed name
+     * @param string $fieldPrefixed prefixed field name (prefix is table alias)
      * @return string
      */
     public function getField(string $fieldPrefixed): string
@@ -117,7 +116,7 @@ class Table
     }
 
     /**
-     * Возвращает строку, состоящую из полей первичного ключа таблицы, разделенных дефисом
+     * Returns string of primary key fields of the table imploded by '-'
      * @return string
      */
     public function stringifyPrimaryKey(): string
@@ -126,8 +125,8 @@ class Table
     }
 
     /**
-     * Проверка наличия данных из таблицы в кортеже, представляющем из себя строку из результата запроса к БД
-     * @param array<string, mixed> $row строка из результата запроса SELECT
+     * Returns true if table row data isset in select-query result row
+     * @param array<string, mixed> $row select-query result row
      * @return bool
      */
     public function issetDataInRow(array &$row): bool
@@ -141,17 +140,17 @@ class Table
     }
 
     /**
-     * Получение данных из кортежа, представляющего из себя строку из результата запроса к БД
-     * @param array<string, mixed> $row строка из результата запроса SELECT
-     * @param JoinConditionCollection $conditionCollection коллекция условий запроса
+     * Returns data from select-query result row
+     * @param array<string, mixed> $row select-query result row
+     * @param JoinConditionCollection $conditionCollection collection of join conditions of the select-query
      * @return array<mixed> [
-     *  "данные из строки, соотвествующие таблице",
-     *  "значения полей первичного ключа через дефис",
-     *  "псевдоним этой таблицы",
-     *  "псевдоним таблицы, к которой осуществляется присоединение",
-     *  "значения полей внешнего ключа через дефис",
-     *  "поле-контейнер у родительского элемента, в который будет помещен элемент этой таблицы",
-     *  "тип отношения к родительской таблице (1 — "один к одному" или 2 — "один ко многим")"
+     *  (array) "table row data from select-query result row",
+     *  (string) "values of the primary key fields imploded by '-'",
+     *  (string) "alias of current table",
+     *  (string) "alias of table to join current table to",
+     *  (string) "values of the foreign key fields imploded by '-'",
+     *  (string) "container key of parent item to put the current item to",
+     *  (int) "condition type for parent table (1 — 'one to one' или 2 — 'one to many')"
      * ]
      * @throws QueryRelationManagerException
      */
@@ -196,7 +195,7 @@ class Table
     }
 
     /**
-     * Получение списка полей первичного ключа таблицы с префиксом-псевдонимом таблицы через точку
+     * Returns list of primary key field names prefixed by table alias by dot
      * @return array<string>
      */
     public function getPrimaryKeyForSelect(): array
@@ -210,8 +209,8 @@ class Table
     }
 
     /**
-     * Установка цепочки полей первичных ключей присоединяемых таблиц до данной
-     * @param array<string> $pkFieldChain
+     * Setter for chain of the primary key's fields of all the joined tables till current
+     * @param array<string> $pkFieldChain primary key fields chain
      * @return $this
      */
     public function setPkFieldChain(array $pkFieldChain): self
@@ -221,8 +220,8 @@ class Table
     }
 
     /**
-     * Получение значений полей первичного ключа таблицы в виде строки через дефис
-     * @param array<string, mixed> $row строка из результата запроса SELECT
+     * Returns values of the table primary key as a string imploded by '-'
+     * @param array<string, mixed> $row select-query result row
      * @return string
      */
     protected function stringifyPrimaryKeyValue(array $row): string

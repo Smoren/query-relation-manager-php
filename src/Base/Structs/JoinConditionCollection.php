@@ -8,27 +8,25 @@ use Smoren\QueryRelationManager\Base\QueryRelationManagerException;
 use Traversable;
 
 /**
- * Class JoinConditionManager
- * Класс-коллекция объектов условий присоединения
+ * Collection of join conditions used in select-query
  * @author Smoren <ofigate@gmail.com>
  * @implements IteratorAggregate<JoinCondition>
  */
 class JoinConditionCollection implements Countable, IteratorAggregate
 {
     /**
-     * @var JoinCondition[] карта объектов условий присоединения по псевдониму присоединяемой таблицы
+     * @var JoinCondition[] map of JoinCondition objects indexed by alias of joined table
      */
     protected array $mapByJoinAs = [];
 
     /**
-     * @var JoinCondition[][] карта списка объектов условий присоединения по псевдониму таблицы,
-     * к которой осуществляется присоединение
+     * @var JoinCondition[][] map of JoinCondition objects lists indexed by alias of the table to join to
      */
     protected array $matrixByJoinTo = [];
 
     /**
-     * Добавление объекта условия присоединения таблицы
-     * @param JoinCondition $condition условие присоединения таблицы
+     * Adds JoinCondition to collection
+     * @param JoinCondition $condition JoinCondition object
      * @return $this
      * @throws QueryRelationManagerException
      */
@@ -51,8 +49,8 @@ class JoinConditionCollection implements Countable, IteratorAggregate
     }
 
     /**
-     * Проверка наличия объекта условия присоединения таблицы по ее псевдониму в запросе
-     * @param string $joinAs псевдоним присоединяемой таблицы
+     * Returns true if condition exists for the joined table alias
+     * @param string $joinAs joined table alias
      * @return bool
      */
     public function issetByJoinAs(string $joinAs): bool
@@ -65,8 +63,8 @@ class JoinConditionCollection implements Countable, IteratorAggregate
     }
 
     /**
-     * Получение объекта условия присоединения таблицы по ее псевдониму в запросе
-     * @param string $joinAs псевдоним присоединяемой таблицы
+     * Returns join condition for the joined table alias
+     * @param string $joinAs joined table alias
      * @return JoinCondition
      */
     public function byJoinAs(string $joinAs): JoinCondition
@@ -75,17 +73,13 @@ class JoinConditionCollection implements Countable, IteratorAggregate
     }
 
     /**
-     * Получение списка объекта условий присоединения таблиц по псевдониму таблицы,
-     * к которой осуществляется присоединение
-     * @param string $joinTo псевдоним таблицы, к которой осуществляется присоединение
+     * Returns list of join conditions by alias of table to join to
+     * @param string $joinTo alias of table to join to
      * @return JoinCondition[]
      */
     public function byJoinTo(string $joinTo): array
     {
-        if(!isset($this->matrixByJoinTo[$joinTo])) {
-            return [];
-        }
-        return $this->matrixByJoinTo[$joinTo];
+        return $this->matrixByJoinTo[$joinTo] ?? [];
     }
 
     /**

@@ -7,31 +7,32 @@ use Smoren\QueryRelationManager\Base\QueryRelationManagerException;
 use Smoren\QueryRelationManager\Base\QueryWrapperInterface;
 
 /**
+ * QueryWrapper implementation for PDO
  * @author Smoren <ofigate@gmail.com>
  */
 class QueryWrapper implements QueryWrapperInterface
 {
     /**
-     * @var PDO|null объект соединения с базой данных
+     * @var PDO|null PDO connection object
      */
     protected static ?PDO $pdo = null;
 
     /**
-     * @var string строка SQL-запроса
+     * @var string SQL query string
      */
     protected string $query;
 
     /**
-     * @var array<string, scalar> массив динамических параметров запроса
+     * @var array<string, scalar> values of dynamic query params
      */
     protected array $mapParams;
 
     /**
-     * Установка конфигурации подключения к БД
+     * Creates and sets default connection to DB
      * @param string $dsn DSN
-     * @param string $username имя пользователя
-     * @param string|null $password пароль
-     * @return PDO объект подключения к БД
+     * @param string $username username
+     * @param string|null $password password
+     * @return PDO PDO connection object
      */
     public static function setDbConfig(string $dsn, string $username, ?string $password = null): PDO
     {
@@ -117,7 +118,7 @@ class QueryWrapper implements QueryWrapperInterface
 
     /**
      * @inheritDoc
-     * @param PDO|null $db
+     * @param PDO|null $db DB connection object
      * @return array<array<mixed>>
      * @throws QueryRelationManagerException
      */
@@ -156,7 +157,8 @@ class QueryWrapper implements QueryWrapperInterface
     }
 
     /**
-     * @param string $sql
+     * Sets raw SQL to query
+     * @param string $sql raw SQL string
      * @return $this
      */
     public function setRawSql(string $sql): self

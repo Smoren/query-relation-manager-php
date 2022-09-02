@@ -8,26 +8,25 @@ use Smoren\QueryRelationManager\Base\QueryRelationManagerException;
 use Traversable;
 
 /**
- * Class TableCollection
- * Класс-коллекция объектов таблиц, участвующих в запросе
+ * Collection of tables used in select-query
  * @author Smoren <ofigate@gmail.com>
  * @implements IteratorAggregate<Table>
  */
 class TableCollection implements Countable, IteratorAggregate
 {
     /**
-     * @var Table|null объект главной таблицы запроса
+     * @var Table|null main table object
      */
     protected ?Table $mainTable = null;
 
     /**
-     * @var Table[] карта объектов таблиц по псевдониму таблицы в запросе
+     * @var Table[] map of tables indexed by table alias in query
      */
     protected array $mapByAlias = [];
 
     /**
-     * Добавление объекта таблицы в коллецию
-     * @param Table $table таблица, участвующая в запросе
+     * Adds table object to the collection
+     * @param Table $table table used in query
      * @return $this
      * @throws QueryRelationManagerException
      */
@@ -43,7 +42,7 @@ class TableCollection implements Countable, IteratorAggregate
     }
 
     /**
-     * Получение объекта главной таблицы запроса
+     * Returns main table of the query
      * @return Table
      * @throws QueryRelationManagerException
      */
@@ -57,8 +56,8 @@ class TableCollection implements Countable, IteratorAggregate
     }
 
     /**
-     * Получение объекта таблицы по ее псевдониму в запросе
-     * @param string $alias псевдоним таблицы в запросе
+     * Returns table object by it's alias in query
+     * @param string $alias table alias in query
      * @return Table
      * @throws QueryRelationManagerException
      */
@@ -68,9 +67,9 @@ class TableCollection implements Countable, IteratorAggregate
     }
 
     /**
-     * Получение цепочки первичных ключей присоединяемых таблиц до данной
-     * @param string $tableAlias
-     * @param JoinConditionCollection $joinConditions
+     * Returns chain of the primary key's fields of all the joined tables till given by alias
+     * @param string $tableAlias table alias
+     * @param JoinConditionCollection $joinConditions collection of join conditions
      * @return array<string>
      * @throws QueryRelationManagerException
      */
@@ -91,9 +90,9 @@ class TableCollection implements Countable, IteratorAggregate
     }
 
     /**
-     * Получение цепочки псеводнимов присоединяемых таблиц до данной
-     * @param string $tableAlias
-     * @param JoinConditionCollection $joinConditions
+     * Returns chain of aliases of all the joined tables till given by alias
+     * @param string $tableAlias table alias
+     * @param JoinConditionCollection $joinConditions collection of join conditions
      * @return array<string>
      */
     public function getTableAliasChain(string $tableAlias, JoinConditionCollection $joinConditions): array
@@ -133,10 +132,10 @@ class TableCollection implements Countable, IteratorAggregate
     }
 
     /**
-     * Добавление объекта таблицы в карту
-     * @param string $mapName имя члена класса-карты
-     * @param string $key ключ в карте
-     * @param Table $table объект таблицы
+     * Adds table object to map
+     * @param string $mapName name of the property stored the target map
+     * @param string $key key to add by
+     * @param Table $table table object to add
      * @return $this
      * @throws QueryRelationManagerException
      */
@@ -151,9 +150,9 @@ class TableCollection implements Countable, IteratorAggregate
     }
 
     /**
-     * Получение объекта таблицы из карты
-     * @param string $mapName имя члена класса-карты
-     * @param string $key ключ в карте
+     * Returns table object from map
+     * @param string $mapName name of the property stored the source map
+     * @param string $key key to get by
      * @return Table
      * @throws QueryRelationManagerException
      */

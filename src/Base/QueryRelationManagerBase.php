@@ -8,43 +8,41 @@ use Smoren\QueryRelationManager\Base\Structs\Table;
 use Smoren\QueryRelationManager\Base\Structs\TableCollection;
 
 /**
- * Абстрактный класс, отвечающий за построение запроса на получение данных из нескольких таблиц
- * с учетом их отношений и дополнительных условий, а также за представление результата в древовидной структуре
+ * Base class for making select-query for getting data from several referenced tables and parsing result to the tree
  * @author Smoren <ofigate@gmail.com>
  */
 abstract class QueryRelationManagerBase
 {
     /**
-     * @var QueryWrapperInterface объект билдера запроса
+     * @var QueryWrapperInterface query builder wrapper
      */
     protected QueryWrapperInterface $query;
 
     /**
-     * @var JoinConditionCollection коллекция отношений в запросе
+     * @var JoinConditionCollection collection of join conditions used in query
      */
     protected JoinConditionCollection $joinConditionCollection;
 
     /**
-     * @var TableCollection коллекция таблиц, участвующих в запросе
+     * @var TableCollection collection of tables used in query
      */
     protected TableCollection $tableCollection;
 
     /**
-     * @var array<callable> массив функций-коллбэков для внесения дополнительных корректив в запров
+     * @var array<callable> list of closures for query modifying
      */
     protected array $filters = [];
 
     /**
-     * @var array<callable> карта функций-коллбэков по псевдониму таблицы для внесения изменений
-     * в готовые данные результата
+     * @var array<string, callable> list of closures indexed by table alias for it's parts of result tree modifying
      */
     protected array $modifierMap = [];
 
     /**
-     * Начинает формирование данных запроса
-     * @param string $className имя класса ActiveRecord, сущности которого нужно получить
-     * @param string $tableAlias псевдоним таблицы в БД для записи отношений
-     * @return static новый объект relation-мененджера
+     * Starts the query
+     * @param string $className ORM-model class name to use in "from" section of select-query
+     * @param string $tableAlias table alias
+     * @return static new instance of relation manager
      * @throws QueryRelationManagerException
      */
     public static function select(string $className, string $tableAlias): self
@@ -53,15 +51,15 @@ abstract class QueryRelationManagerBase
     }
 
     /**
-     * Добавляет к запросу связь "один к одному" с другой сущностью ActiveRecord
-     * @param string $containerFieldAlias название поля, куда будет записана сущность в результате
-     * @param string $className имя класса ActiveRecord, сущности которого нужно подключить
-     * @param string $joinAs псевдоним для таблицы, связанной с классом
-     * @param string $joinTo псевдоним таблицы, к которой будут подключаться сущности класса
-     * @param array<string, string> $joinCondition основное условие присоединения
-     * @param string $joinType тип присоединения таблицы ("inner", "left", "right")
-     * @param string|null $extraJoinCondition дополнительные условия join-связи
-     * @param array<string, scalar> $extraJoinParams параметры дополнительных условий join-связи
+     * Adds "join" reference of type "one to one" with another ORM-model
+     * @param string $containerFieldAlias container key of parent item to put the current item to
+     * @param string $className name of the ORM-model class to use in "join" section
+     * @param string $joinAs alias of joined table
+     * @param string $joinTo alias of table to join to
+     * @param array<string, string> $joinCondition main join condition
+     * @param string $joinType join type ("inner", "left", "right")
+     * @param string|null $extraJoinCondition extra join conditions
+     * @param array<string, scalar> $extraJoinParams values of dynamic extra params
      * @return $this
      * @throws QueryRelationManagerException
      */
@@ -100,15 +98,15 @@ abstract class QueryRelationManagerBase
     }
 
     /**
-     * Добавляет к запросу связь "один ко многим" с другими сущностями ActiveRecord
-     * @param string $containerFieldAlias название поля, куда будет записана сущность в результате
-     * @param string $className имя класса ActiveRecord, сущности которого нужно подключить
-     * @param string $joinAs псевдоним для таблицы, связанной с классом
-     * @param string $joinTo псевдоним таблицы, к которой будут подключаться сущности класса
-     * @param array<string, string> $joinCondition основное условие присоединения
-     * @param string $joinType тип присоединения таблицы ("inner", "left", "right")
-     * @param string|null $extraJoinCondition дополнительные условия join-связи
-     * @param array<string, scalar> $extraJoinParams параметры дополнительных условий join-связи
+     * Adds "join" reference of type "one to many" with another ORM-model
+     * @param string $containerFieldAlias container key of parent item to put the current item to
+     * @param string $className name of the ORM-model class to use in "join" section
+     * @param string $joinAs alias of joined table
+     * @param string $joinTo alias of table to join to
+     * @param array<string, string> $joinCondition main join condition
+     * @param string $joinType join type ("inner", "left", "right")
+     * @param string|null $extraJoinCondition extra join conditions
+     * @param array<string, scalar> $extraJoinParams values of dynamic extra params
      * @return $this
      * @throws QueryRelationManagerException
      */
@@ -147,34 +145,32 @@ abstract class QueryRelationManagerBase
     }
 
     /**
-     * Добавляет функцию-модификатор запроса
-     * @param callable $filter
+     * Adds closure for query modifying
+     * @param callable $filter query modifier closure
      * @return $this
      */
     public function filter(callable $filter): self
     {
         $this->filters[] = $filter;
-
         return $this;
     }
 
     /**
-     * Устанавливает для таблицы функцию-модификатор сущности результата
-     * @param string $tableAlias псевдоним таблицы
-     * @param callable $modifier функция-модификатор результата
+     * Adds closure for result tree modifying by table alias
+     * @param string $tableAlias table alias
+     * @param callable $modifier result modifier closure
      * @return $this
      */
     public function modify(string $tableAlias, callable $modifier): self
     {
         $this->modifierMap[$tableAlias] = $modifier;
-
         return $this;
     }
 
     /**
-     * Выполняет запрос к базе, собирает и возвращает результат
-     * @param mixed|null $db подключение к БД
-     * @return array<array<mixed>> массив сущностей главной таблицы с отношениями подключенных таблиц
+     * Executes query, builds tree and return it
+     * @param mixed|null $db DB connection object
+     * @return array<array<mixed>> result tree
      * @throws QueryRelationManagerException
      */
     public function all($db = null): array
@@ -240,7 +236,7 @@ abstract class QueryRelationManagerBase
     }
 
     /**
-     * Создает и выстраивает SQL-запрос
+     * Builds query
      * @return QueryWrapperInterface
      * @throws QueryRelationManagerException
      */
@@ -284,6 +280,7 @@ abstract class QueryRelationManagerBase
     }
 
     /**
+     * Returns collection of tables used in query
      * Возвращает коллекцию объектов таблиц, участвующих в запросе
      * @return TableCollection
      */
@@ -293,7 +290,7 @@ abstract class QueryRelationManagerBase
     }
 
     /**
-     * Возвращает текст SQL-запроса
+     * Returns raw SQL query string
      * @return string текст SQL-запроса
      * @throws QueryRelationManagerException
      */
@@ -305,35 +302,35 @@ abstract class QueryRelationManagerBase
     }
 
     /**
-     * Возвращает имя таблицы по классу сущности ActiveRecord
-     * @param string $className имя класса
-     * @return string имя таблицы
+     * Return table name by ORM-model class name
+     * @param string $className ORM-model class name
+     * @return string table name
      * @throws QueryRelationManagerException
      */
     abstract protected function getTableName(string $className): string;
 
     /**
-     * Возвращает список полей таблицы
-     * @param string $className
+     * Returns list of names of the table fields by ORM-model class name
+     * @param string $className ORM-model class name
      * @return array<string>
      */
     abstract protected function getTableFields(string $className): array;
 
     /**
-     * Возвращает поля первичного ключа таблицы
-     * @param string $className
+     * Returns list of names of the primary key fields by ORM-model class name
+     * @param string $className ORM-model class name
      * @return array<string>
      */
     abstract protected function getPrimaryKey(string $className): array;
 
     /**
-     * Создает объект запроса
+     * Creates ORM query wrapper object
      * @return QueryWrapperInterface
      */
     abstract protected function createQuery(): QueryWrapperInterface;
 
     /**
-     * Магический метод для клонирования инстанса
+     * Magic method for cloning
      */
     public function __clone()
     {
@@ -343,8 +340,8 @@ abstract class QueryRelationManagerBase
 
     /**
      * QueryRelationManager constructor.
-     * @param string $className имя класса сущности ActiveRecord
-     * @param string $alias псевдоним таблицы сущности
+     * @param string $className ORM-model class name
+     * @param string $alias DB table alias
      * @throws QueryRelationManagerException
      */
     final protected function __construct(string $className, string $alias)

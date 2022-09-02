@@ -7,7 +7,7 @@ use Smoren\QueryRelationManager\Base\QueryWrapperInterface;
 use Smoren\QueryRelationManager\Base\QueryRelationManagerException;
 
 /**
- * @inheritDoc
+ * QueryRelationManager implementation for PDO
  * @author Smoren <ofigate@gmail.com>
  */
 class QueryRelationManager extends QueryRelationManagerBase
