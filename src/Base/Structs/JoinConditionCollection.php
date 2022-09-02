@@ -2,14 +2,18 @@
 
 namespace Smoren\QueryRelationManager\Base\Structs;
 
+use Countable;
+use IteratorAggregate;
 use Smoren\QueryRelationManager\Base\QueryRelationManagerException;
+use Traversable;
 
 /**
  * Class JoinConditionManager
  * Класс-коллекция объектов условий присоединения
  * @author Smoren <ofigate@gmail.com>
+ * @implements IteratorAggregate<JoinCondition>
  */
-class JoinConditionCollection
+class JoinConditionCollection implements Countable, IteratorAggregate
 {
     /**
      * @var JoinCondition[] карта объектов условий присоединения по псевдониму присоединяемой таблицы
@@ -85,16 +89,21 @@ class JoinConditionCollection
     }
 
     /**
-     * Перебор коллекции
-     * @param callable $callback функция, которая будет запущена для каждого элемента коллекции
-     * с передачей оного в качестве аргумента
-     * @return $this
+     * @inheritDoc
+     * @return Traversable<JoinCondition>
      */
-    public function each(callable $callback): self
+    public function getIterator(): Traversable
     {
         foreach($this->mapByJoinAs as $condition) {
-            $callback($condition);
+            yield $condition;
         }
-        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function count(): int
+    {
+        return count($this->mapByJoinAs);
     }
 }

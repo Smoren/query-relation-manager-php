@@ -2,14 +2,18 @@
 
 namespace Smoren\QueryRelationManager\Base\Structs;
 
+use Countable;
+use IteratorAggregate;
 use Smoren\QueryRelationManager\Base\QueryRelationManagerException;
+use Traversable;
 
 /**
  * Class TableCollection
  * Класс-коллекция объектов таблиц, участвующих в запросе
  * @author Smoren <ofigate@gmail.com>
+ * @implements IteratorAggregate<Table>
  */
-class TableCollection
+class TableCollection implements Countable, IteratorAggregate
 {
     /**
      * @var Table|null объект главной таблицы запроса
@@ -64,20 +68,6 @@ class TableCollection
     }
 
     /**
-     * Перебор коллекции
-     * @param callable $callback функция, которая будет запущена для каждого элемента коллекции
-     * с передачей оного в качестве аргумента
-     * @return $this
-     */
-    public function each(callable $callback): self
-    {
-        foreach($this->mapByAlias as $table) {
-            $callback($table);
-        }
-        return $this;
-    }
-
-    /**
      * Получение цепочки первичных ключей присоединяемых таблиц до данной
      * @param string $tableAlias
      * @param JoinConditionCollection $joinConditions
@@ -121,6 +111,25 @@ class TableCollection
         }
 
         return array_reverse($result);
+    }
+
+    /**
+     * @inheritDoc
+     * @return Traversable<Table>
+     */
+    public function getIterator(): Traversable
+    {
+        foreach($this->mapByAlias as $table) {
+            yield $table;
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function count(): int
+    {
+        return count($this->mapByAlias);
     }
 
     /**

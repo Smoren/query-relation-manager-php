@@ -138,6 +138,9 @@ class PDOTest extends \Codeception\Test\Unit
         $this->assertEquals(3, $resultMap[6]['mark_average']);
     }
 
+    /**
+     * @throws QueryRelationManagerException
+     */
     public function testQuery()
     {
         $this->initDbConfig();
@@ -179,6 +182,9 @@ class PDOTest extends \Codeception\Test\Unit
         $a = 1;
     }
 
+    /**
+     * @throws QueryRelationManagerException
+     */
     public function testExtra()
     {
         $this->initDbConfig();
@@ -223,6 +229,9 @@ class PDOTest extends \Codeception\Test\Unit
         }
     }
 
+    /**
+     * @throws QueryRelationManagerException
+     */
     public function testJoinCondition()
     {
         $cond = new JoinCondition(
@@ -232,16 +241,22 @@ class PDOTest extends \Codeception\Test\Unit
             ['city_id' => 'id']
         );
         $condCollection = new JoinConditionCollection();
+        $this->assertCount(0, $condCollection);
         $condCollection->add($cond);
+        $this->assertCount(1, $condCollection);
 
         try {
             $condCollection->add($cond);
             $this->expectError();
         } catch(QueryRelationManagerException $e) {
+            $this->assertCount(1, $condCollection);
             $this->assertEquals("duplicate table alias 'a'", $e->getMessage());
         }
     }
 
+    /**
+     * @throws QueryRelationManagerException
+     */
     public function testTable()
     {
         try {
@@ -258,13 +273,16 @@ class PDOTest extends \Codeception\Test\Unit
         $this->assertEquals(['a.id', 'a.name'], $table->getPrimaryKeyForSelect());
 
         $tableCollection = new TableCollection();
+        $this->assertCount(0, $tableCollection);
         try {
             $tableCollection->getMainTable();
             $this->expectError();
         } catch(QueryRelationManagerException $e) {
+            $this->assertCount(0, $tableCollection);
             $this->assertEquals('no main table found in TableManager', $e->getMessage());
         }
         $tableCollection->add($table);
+        $this->assertCount(1, $tableCollection);
         $this->assertTrue($table === $tableCollection->getMainTable());
 
         try {

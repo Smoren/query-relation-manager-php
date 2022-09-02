@@ -184,16 +184,16 @@ abstract class QueryRelationManagerBase
         $rows = $this->query->all($db);
 
         $map = [];
-        $this->tableCollection->each(function(Table $table) use (&$map) {
+        foreach($this->tableCollection as $table) {
             $map[$table->alias] = [];
-        });
+        }
 
         $bufMap = [];
 
         foreach($rows as $row) {
-            $this->tableCollection->each(function(Table $table) use (&$map, &$row, &$bufMap) {
+            foreach($this->tableCollection as $table) {
                 if(!$table->issetDataInRow($row)) {
-                    return;
+                    continue;
                 }
 
                 [$item, $pkValue, $alias, $aliasTo, $fkValue, $containerFieldAlias, $type]
@@ -225,7 +225,8 @@ abstract class QueryRelationManagerBase
                             throw new QueryRelationManagerException("unknown condition type '{$type}'");
                     }
                 }
-            });
+                unset($item);
+            }
         }
 
         foreach($this->modifierMap as $alias => $modifier) {
@@ -245,20 +246,20 @@ abstract class QueryRelationManagerBase
      */
     public function prepare(): QueryWrapperInterface
     {
-        $this->tableCollection->each(function(Table $table) {
+        foreach($this->tableCollection as $table) {
             $table->setPkFieldChain(
                 $this->tableCollection->getPkFieldChain($table->alias, $this->joinConditionCollection)
             );
-        });
+        }
 
         $this->query = $this->createQuery();
 
         $arSelect = [];
-        $this->tableCollection->each(function(Table $table) use (&$arSelect) {
+        foreach($this->tableCollection as $table) {
             foreach($table->getFieldMap() as $fieldName => $fieldNamePrefixed) {
                 $arSelect[$fieldNamePrefixed] = $fieldName;
             }
-        });
+        }
 
         $mainTable = $this->tableCollection->getMainTable();
 
@@ -266,15 +267,14 @@ abstract class QueryRelationManagerBase
             ->select($arSelect)
             ->from([$mainTable->alias => $mainTable->name]);
 
-        $this->joinConditionCollection->each(function(JoinCondition $cond) {
+        foreach($this->joinConditionCollection as $cond) {
             $this->query->join(
                 $cond->joinType,
                 [$cond->table->alias => $cond->table->name],
                 $cond->stringify(),
                 $cond->extraJoinParams
             );
-        });
-
+        }
 
         foreach($this->filters as $modifier) {
             $modifier($this->query->getQuery());
