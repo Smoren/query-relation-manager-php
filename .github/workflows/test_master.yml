@@ -47,8 +47,8 @@ jobs:
 
       - name: Run Composer
         run: composer install --no-interaction
-        
-      - name: Run migrations:
+
+      - name: Run migrations
         run composer test-migrate
 
       - name: Unit tests
