@@ -324,6 +324,6 @@ class PDOTest extends \Codeception\Test\Unit
 
     protected function initDbConfig(): void
     {
-        QueryWrapper::setDbConfig('mysql:host=127.0.0.1;dbname=app', 'user', '123456789');
+        QueryWrapper::setDbConfig('mysql:host=127.0.0.1;dbname=query_relation_manager_test', 'user', '123456789');
     }
 }

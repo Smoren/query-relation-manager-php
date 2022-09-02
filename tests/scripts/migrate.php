@@ -1,7 +1,7 @@
 <?php
 
 $dbh = new PDO(
-    'mysql:host=127.0.0.1;dbname=app',
+    'mysql:host=127.0.0.1;dbname=query_relation_manager_test',
     'user',
     '123456789',
     [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
