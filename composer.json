@@ -39,6 +39,7 @@
   ],
   "scripts": {
     "test-init": ["./vendor/bin/codecept build"],
+    "test-migrate": ["php ./tests/scripts/migrate.php"],
     "test-all": ["composer test-coverage", "composer codesniffer", "composer stan"],
     "test": ["./vendor/bin/codecept run unit tests/unit"],
     "test-coverage": ["./vendor/bin/codecept run unit tests/unit --coverage"],
