@@ -2,6 +2,7 @@
 
 ![Packagist PHP Version Support](https://img.shields.io/packagist/php-v/smoren/query-relation-manager)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Smoren/query-relation-manager-php/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Smoren/query-relation-manager-php/?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/Smoren/query-relation-manager-php/badge.svg?branch=master)](https://coveralls.io/github/Smoren/query-relation-manager-php?branch=master)
 ![Build and test](https://github.com/Smoren/query-relation-manager-php/actions/workflows/test_master.yml/badge.svg)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 

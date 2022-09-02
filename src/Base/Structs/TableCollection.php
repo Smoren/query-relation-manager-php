@@ -12,14 +12,14 @@ use Smoren\QueryRelationManager\Base\QueryRelationManagerException;
 class TableCollection
 {
     /**
-     * @var Table объект главной таблицы запроса
+     * @var Table|null объект главной таблицы запроса
      */
-    protected $mainTable;
+    protected ?Table $mainTable = null;
 
     /**
      * @var Table[] карта объектов таблиц по псевдониму таблицы в запросе
      */
-    protected $mapByAlias = [];
+    protected array $mapByAlias = [];
 
     /**
      * Добавление объекта таблицы в коллецию

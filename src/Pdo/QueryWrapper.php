@@ -14,7 +14,7 @@ class QueryWrapper implements QueryWrapperInterface
     /**
      * @var PDO|null объект соединения с базой данных
      */
-    protected static ?PDO $pdo;
+    protected static ?PDO $pdo = null;
 
     /**
      * @var string строка SQL-запроса
@@ -169,7 +169,7 @@ class QueryWrapper implements QueryWrapperInterface
     /**
      * @inheritDoc
      */
-    public function getQuery()
+    public function &getQuery()
     {
         return $this->query;
     }
