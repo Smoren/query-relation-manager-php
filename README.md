@@ -6,13 +6,16 @@
 ![Build and test](https://github.com/Smoren/query-relation-manager-php/actions/workflows/test_master.yml/badge.svg)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+Implements the functionality of getting tree data from a database with one-to-one and one-to-many relationships using
+only one select-query to the database with flexible conditions configuration.
 
-Реализует функционал получения данных из БД с отношениями "один к одному" и "один ко многим" с использованием одного 
-запроса к БД, а также с учетом всех ограничений в запросе при получении отношений.
+**QueryRelationManager** can be integrated with any ORM system based on PHP and potentially compatible with any relational DBMS.
 
-Может быть использован в любой ORM на php, потенциально совместим с любой реляционной СУБД.
+Current package includes an example of integration with raw PDO without ORM.
 
-Включает в себя пример реализации для чистого PDO без ORM.
+Also there is an implementation for **ActiveRecord** as [extension for **Yii2**](https://github.com/Smoren/yii2-query-relation-manager).
 
-Реализация для работы с **ActiveRecord** в виде расширения для **Yii2**:
-https://github.com/Smoren/yii2-query-relation-manager
+### How to install to your project
+```
+composer require smoren/query-relation-manager
+```
