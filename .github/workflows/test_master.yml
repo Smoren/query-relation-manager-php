@@ -16,6 +16,16 @@ jobs:
       matrix:
         php: ['7.4', '8.0', '8.1']
 
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_DATABASE: app
+        ports:
+          - 3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
     steps:
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
@@ -37,6 +47,9 @@ jobs:
 
       - name: Run Composer
         run: composer install --no-interaction
+        
+      - name: Run migrations:
+        run composer test-migrate
 
       - name: Unit tests
         run: |
