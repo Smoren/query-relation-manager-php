@@ -54,7 +54,7 @@ class QueryRelationManager extends QueryRelationManagerBase
     protected function getPrimaryKey(string $className): array
     {
         $qw = new QueryWrapper();
-        $qw->setRawSql("SHOW COLUMNS FROM ".addslashes($className)." WHERE Key = 'PRI'");
+        $qw->setRawSql("SHOW COLUMNS FROM `".addslashes($className)."` WHERE `Key` = 'PRI'");
         $rows = $qw->all();
 
         /** @var array<string> $result */

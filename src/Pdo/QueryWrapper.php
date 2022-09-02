@@ -30,10 +30,10 @@ class QueryWrapper implements QueryWrapperInterface
      * Установка конфигурации подключения к БД
      * @param string $dsn DSN
      * @param string $username имя пользователя
-     * @param string $password пароль
+     * @param string|null $password пароль
      * @return PDO объект подключения к БД
      */
-    public static function setDbConfig(string $dsn, string $username, string $password): PDO
+    public static function setDbConfig(string $dsn, string $username, ?string $password = null): PDO
     {
         static::$pdo = new PDO(
             $dsn,
